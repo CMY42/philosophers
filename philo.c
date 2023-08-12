@@ -6,32 +6,96 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:28 by cmansey           #+#    #+#             */
-/*   Updated: 2023/04/25 15:31:40 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/12 20:26:04 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	*routine(void *text)
+void	*philosopher_thread(void *arg)
 {
-	printf("Thread [%s]\n", (char *)text);
-	sleep(2);
-	printf("Thread finish\n");
+	t_Philosopher	*philosopher;
+
+	philosopher = (t_Philosopher *)arg;
+	while (!philosopher->sim->someone_died)
+	{
+		print_message(philosopher, "is thinking");
+		usleep(1000 * philosopher->time_to_sleep);
+		take_forks(philosopher);
+		print_message(philosopher, "is eating");
+		usleep(1000 * philosopher->time_to_eat);
+		put_forks(philosopher);
+	}
 	return (NULL);
 }
 
-int	init_thread(void)
+// Verrouiller les fourchettes dans l'ordre numérique pour éviter les deadlocks
+void	take_forks(t_Philosopher *philosopher)
 {
-	pthread_t	t1;
-	pthread_t	t2;
-	char		*test;
-	char		*test2;
+	int	left_fork;
+	int	right_fork;
 
-	test = "Hello World";
-	test2 = "Goodbye World";
-	pthread_create(&t1, NULL, &routine, test);
-	pthread_create(&t2, NULL, &routine, test2);
-	pthread_join(t1, NULL);
-	pthread_join(t2, NULL);
-	return (0);
+	left_fork = philosopher->id;
+	right_fork = (philosopher->id + 1) % philosopher->sim->num_philosophers;
+	if (left_fork < right_fork)
+	{
+		pthread_mutex_lock(&(philosopher->sim->forks[left_fork]));
+		pthread_mutex_lock(&(philosopher->sim->forks[right_fork]));
+	}
+	else
+	{
+		pthread_mutex_lock(&(philosopher->sim->forks[right_fork]));
+		pthread_mutex_lock(&(philosopher->sim->forks[left_fork]));
+	}
+}
+
+// Déverrouiller les fourchettes dans l'ordre inverse pour éviter les deadlocks
+void	put_forks(t_Philosopher *philosopher)
+{
+	int	left_fork;
+	int	right_fork;
+
+	left_fork = philosopher->id;
+	right_fork = (philosopher->id + 1) % philosopher->sim->num_philosophers;
+	if (left_fork < right_fork)
+	{
+		pthread_mutex_unlock(&(philosopher->sim->forks[right_fork]));
+		pthread_mutex_unlock(&(philosopher->sim->forks[left_fork]));
+	}
+	else
+	{
+		pthread_mutex_unlock(&(philosopher->sim->forks[left_fork]));
+		pthread_mutex_unlock(&(philosopher->sim->forks[right_fork]));
+	}
+}
+
+void	print_message(t_Philosopher *philosopher, const char *message)
+{
+	struct timeval	current_time;
+	long long		timestamp_ms;
+
+	gettimeofday(&current_time, NULL);
+	timestamp_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
+	pthread_mutex_lock(&(philosopher->sim->print_mutex));
+	printf("%lld %d %s\n", timestamp_ms, philosopher->id + 1, message);
+	pthread_mutex_unlock(&(philosopher->sim->print_mutex));
+}
+
+int	main(int argc, char **argv)
+{
+	t_Simulation	sim;
+
+	if (argc < 4 || argc > 5)
+	{
+		printf("Wrong numbers of arguments.\n");
+		return (EXIT_FAILURE);
+	}
+	if (!init_simulation(&sim, argv))
+	{
+		fprintf(stderr, "Error: Failed to initialize simulation.\n");
+		return (EXIT_FAILURE);
+	}
+	start_simulation(&sim);
+	cleanup_simulation(&sim);
+	return (EXIT_SUCCESS);
 }

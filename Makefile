@@ -6,19 +6,19 @@
 #    By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/25 14:23:52 by cmansey           #+#    #+#              #
-#    Updated: 2023/04/25 14:55:24 by cmansey          ###   ########.fr        #
+#    Updated: 2023/08/12 18:18:23 by cmansey          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-SRC = philo.c
+SRC = philo.c simulation.c error.c
 
 OBJ := $(SRC:%.c=%.o)
 
 CC = gcc
 RM = rm -f
-CFLAGS = -Wextra -Wall -Werror
+CFLAGS = -Wextra -Wall -Werror -pthread
 
 all: $(NAME)
 
