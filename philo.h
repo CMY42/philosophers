@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/14 14:11:47 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/21 18:06:09 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ typedef struct s_Philosopher
 	int time_to_die; // Délai avant la mort du philosophe
 	int time_to_eat; // Délai pour manger
 	int time_to_sleep; // Délai pour dormir
+	int meals_eaten;
 	struct s_Simulation	*sim;
 }	t_Philosopher;
 
@@ -49,7 +50,8 @@ typedef struct s_Simulation
 	pthread_mutex_t print_mutex; // Mutex pour l'affichage
 	pthread_mutex_t someone_died_mutex;
 	int someone_died; // Indicateur si un philosophe est mort
-}	t_Simulation;
+	int num_times_each_must_eat;
+	}	t_Simulation;
 
 // Déclaration des fonctions
 int		init_simulation(t_Simulation *sim, char **argv);

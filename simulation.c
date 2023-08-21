@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/15 20:29:26 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/21 18:13:21 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void	init_philo(t_Simulation *sim)
 		philosopher->time_to_eat = sim->time_to_eat;
 		philosopher->time_to_sleep = sim->time_to_sleep;
 		philosopher->sim = sim;
+		philosopher->meals_eaten = 0;
 		i++;
 	}
 }
@@ -112,6 +113,8 @@ int	init_simulation(t_Simulation *sim, char **argv)
 	sim->time_to_die = atoi(argv[2]);
 	sim->time_to_eat = atoi(argv[3]);
 	sim->time_to_sleep = atoi(argv[4]);
+	if (argv[5])
+		sim->num_times_each_must_eat = atoi(argv[5]);
 	sim->someone_died = 0;
 	sim->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* sim->num_philosophers);
@@ -121,12 +124,9 @@ int	init_simulation(t_Simulation *sim, char **argv)
 			* sim->num_philosophers);
 	if (sim->philosophers == NULL)
 		error_philo(sim);
-	i = 0;
-	while (i < sim->num_philosophers)
-	{
+	i = -1;
+	while (++i < sim->num_philosophers)
 		pthread_mutex_init(&(sim->forks[i]), NULL);
-		i++;
-	}
 	pthread_mutex_init(&(sim->someone_died_mutex), NULL);
 	init_philo(sim);
 	pthread_mutex_init(&(sim->print_mutex), NULL);

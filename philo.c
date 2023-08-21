@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:28 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/21 17:35:31 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/21 18:08:20 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,8 @@ void	*philosopher_thread(void *arg)
 			philosopher->sim->someone_died = 1;
 			pthread_mutex_unlock(&(philosopher->sim->someone_died_mutex));
 			print_message(philosopher, "died");
-			break;
+			return (NULL);
+
 		}
 		if (philosopher->sim->num_philosophers == 1)
 		{
@@ -103,17 +104,18 @@ void	*philosopher_thread(void *arg)
 			philosopher->sim->someone_died = 1;
 			pthread_mutex_unlock(&(philosopher->sim->someone_died_mutex));
 			print_message(philosopher, "died");
-			break;
+			return (NULL);
 		}
 		take_forks(philosopher);
 		print_message(philosopher, "has taken a fork");
 		print_message(philosopher, "has taken a fork");
 		print_message(philosopher, "is eating");
+		philosopher->meals_eaten++;
 		usleep(1000 * philosopher->time_to_eat);
 		put_forks(philosopher);
-
 		gettimeofday(&last_meal_time, NULL);
-
+		if (philosopher->sim->num_times_each_must_eat > 0 && philosopher->meals_eaten == philosopher->sim->num_times_each_must_eat)
+			return (NULL);
 		print_message(philosopher, "is sleeping");
 		usleep(1000 * philosopher->time_to_sleep);
 	}
@@ -209,7 +211,7 @@ int	main(int argc, char **argv)
 {
 	t_Simulation	sim;
 
-	if (argc < 4 || argc > 5)
+	if (argc < 5 || argc > 6)
 	{
 		printf("Wrong numbers of arguments.\n");
 		return (EXIT_FAILURE);
