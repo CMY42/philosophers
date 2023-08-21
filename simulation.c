@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/12 20:26:00 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/15 20:29:26 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,6 @@ void	create_philosophers(t_Simulation *sim)
 	}
 }
 
-void	start_simulation(t_Simulation *sim)
-{
-	int	i;
-
-	i = 0;
-	while (i < sim->num_philosophers)
-	{
-		pthread_join(sim->philosophers[i].thread, NULL);
-		i++;
-	}
-}
-
 // Libérer les mutex des fourchettes
 // Libérer les ressources des philosophes
 // Détruire le mutex pour l'affichage
@@ -56,9 +44,44 @@ void	cleanup_simulation(t_Simulation *sim)
 	}
 	free(sim->forks);
 	free(sim->philosophers);
+	pthread_mutex_destroy(&(sim->someone_died_mutex));
 	pthread_mutex_destroy(&(sim->print_mutex));
 }
+/*void cleanup_simulation(t_Simulation *sim)
+{
+    int i;
 
+    // Attendre la fin de tous les threads avant de nettoyer les ressources
+    for (i = 0; i < sim->num_philosophers; i++)
+    {
+        pthread_join(sim->philosophers[i].thread, NULL);
+    }
+
+    // Détruire les mutex des fourchettes
+    for (i = 0; i < sim->num_philosophers; i++)
+    {
+        pthread_mutex_destroy(&(sim->forks[i]));
+    }
+
+    free(sim->forks);
+    free(sim->philosophers);
+    pthread_mutex_destroy(&(sim->someone_died_mutex));
+    pthread_mutex_destroy(&(sim->print_mutex));
+}*/
+
+void	start_simulation(t_Simulation *sim)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->num_philosophers)
+	{
+		pthread_join(sim->philosophers[i].thread, NULL);
+		i++;
+	}
+}
+
+//% pour etre sur que le dernier philo prenne la premiere fourchette
 void	init_philo(t_Simulation *sim)
 {
 	t_Philosopher	*philosopher;
@@ -68,7 +91,7 @@ void	init_philo(t_Simulation *sim)
 	while (i < sim->num_philosophers)
 	{
 		philosopher = &(sim->philosophers[i]);
-		philosopher->id = i + 1;
+		philosopher->id = i;
 		philosopher->left_fork = &(sim->forks[i]);
 		philosopher->right_fork = &(sim->forks[(i + 1)
 				% sim->num_philosophers]);
@@ -89,6 +112,7 @@ int	init_simulation(t_Simulation *sim, char **argv)
 	sim->time_to_die = atoi(argv[2]);
 	sim->time_to_eat = atoi(argv[3]);
 	sim->time_to_sleep = atoi(argv[4]);
+	sim->someone_died = 0;
 	sim->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* sim->num_philosophers);
 	if (sim->forks == NULL)
@@ -103,6 +127,7 @@ int	init_simulation(t_Simulation *sim, char **argv)
 		pthread_mutex_init(&(sim->forks[i]), NULL);
 		i++;
 	}
+	pthread_mutex_init(&(sim->someone_died_mutex), NULL);
 	init_philo(sim);
 	pthread_mutex_init(&(sim->print_mutex), NULL);
 	return (1);
