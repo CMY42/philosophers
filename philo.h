@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/21 18:06:09 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/28 20:46:43 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,11 @@ typedef struct s_Philosopher
 	int time_to_die; // Délai avant la mort du philosophe
 	int time_to_eat; // Délai pour manger
 	int time_to_sleep; // Délai pour dormir
-	int meals_eaten;
+	int meals_eaten; // Nombre de repas mange
+	struct timeval last_meal_time; // Temps du dernier repas
+	struct timeval current_time; // Temps actuel
+	struct timeval	start_time;
+	long long time_diff; // Différence de temps
 	struct s_Simulation	*sim;
 }	t_Philosopher;
 

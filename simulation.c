@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/21 18:13:21 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/28 20:46:44 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,24 +49,24 @@ void	cleanup_simulation(t_Simulation *sim)
 }
 /*void cleanup_simulation(t_Simulation *sim)
 {
-    int i;
+	int i;
 
-    // Attendre la fin de tous les threads avant de nettoyer les ressources
-    for (i = 0; i < sim->num_philosophers; i++)
-    {
-        pthread_join(sim->philosophers[i].thread, NULL);
-    }
+	// Attendre la fin de tous les threads avant de nettoyer les ressources
+	for (i = 0; i < sim->num_philosophers; i++)
+	{
+		pthread_join(sim->philosophers[i].thread, NULL);
+	}
 
-    // Détruire les mutex des fourchettes
-    for (i = 0; i < sim->num_philosophers; i++)
-    {
-        pthread_mutex_destroy(&(sim->forks[i]));
-    }
+	// Détruire les mutex des fourchettes
+	for (i = 0; i < sim->num_philosophers; i++)
+	{
+		pthread_mutex_destroy(&(sim->forks[i]));
+	}
 
-    free(sim->forks);
-    free(sim->philosophers);
-    pthread_mutex_destroy(&(sim->someone_died_mutex));
-    pthread_mutex_destroy(&(sim->print_mutex));
+	free(sim->forks);
+	free(sim->philosophers);
+	pthread_mutex_destroy(&(sim->someone_died_mutex));
+	pthread_mutex_destroy(&(sim->print_mutex));
 }*/
 
 void	start_simulation(t_Simulation *sim)
