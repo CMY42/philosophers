@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/28 20:46:43 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/29 20:37:23 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ typedef struct s_Philosopher
 	int meals_eaten; // Nombre de repas mange
 	struct timeval last_meal_time; // Temps du dernier repas
 	struct timeval current_time; // Temps actuel
-	struct timeval	start_time;
+	struct timeval	start_time; // Temps au debut
 	long long time_diff; // Différence de temps
 	struct s_Simulation	*sim;
 }	t_Philosopher;
@@ -68,5 +68,7 @@ void	put_forks(t_Philosopher *philosopher);
 void	print_message(t_Philosopher *philosopher, const char *message);
 int		error_forks(t_Simulation *sim);
 int		error_philo(t_Simulation *sim);
+int		ft_atoi(const char *str);
+
 
 #endif

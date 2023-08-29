@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/28 20:46:44 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/29 20:00:31 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void	create_philosophers(t_Simulation *sim)
 		if (pthread_create(&(philo->thread), NULL, philosopher_thread, philo)
 			!= 0)
 			exit(EXIT_FAILURE);
+		gettimeofday(&(sim->philosophers[i].last_meal_time), NULL);
 		i++;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:28 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/28 20:46:42 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/29 20:59:55 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,14 +76,13 @@ void	*philosopher_thread(void *arg)
 t_Philosopher	*philosopher;
 
 	philosopher = (t_Philosopher *)arg;
-	gettimeofday(&(philosopher->last_meal_time), NULL);
 	gettimeofday(&(philosopher->start_time), NULL); // Record the start time
 
 		while (!philosopher->sim->someone_died)
 	{
 		gettimeofday(&(philosopher->current_time), NULL);
-		philosopher->time_diff = (philosopher->current_time.tv_sec - philosopher->last_meal_time.tv_sec) * 1000 +
-			(philosopher->current_time.tv_usec - philosopher->last_meal_time.tv_usec) / 1000;
+		philosopher->time_diff = (((philosopher->current_time.tv_sec - philosopher->last_meal_time.tv_sec) * 1000) +
+			((philosopher->current_time.tv_usec - philosopher->last_meal_time.tv_usec) / 1000) * 0.9 + 1);
 
 		if (philosopher->time_diff >= philosopher->time_to_die)
 		{
@@ -102,23 +101,22 @@ t_Philosopher	*philosopher;
 			print_message(philosopher, "died");
 			exit (0);
 		}
+		print_message(philosopher, "is thinking");
 		take_forks(philosopher);
 		print_message(philosopher, "has taken a fork");
 		print_message(philosopher, "has taken a fork");
 		print_message(philosopher, "is eating");
-		philosopher->meals_eaten++;
 		gettimeofday(&(philosopher->last_meal_time), NULL);
+		philosopher->meals_eaten++;
 		usleep(1000 * philosopher->time_to_eat);
 		put_forks(philosopher);
 		if (philosopher->sim->num_times_each_must_eat > 0 && philosopher->meals_eaten == philosopher->sim->num_times_each_must_eat)
 			return (NULL);
 		print_message(philosopher, "is sleeping");
 		usleep(1000 * philosopher->time_to_sleep);
-		print_message(philosopher, "is thinking");
 	}
 	return (NULL);
 }
-
 
 // Verrouiller les fourchettes dans l'ordre numérique pour éviter les deadlocks
 void	take_forks(t_Philosopher *philosopher)
