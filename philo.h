@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/29 20:37:23 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/31 17:43:51 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,37 +25,59 @@
 # include <pthread.h>
 
 // Structure pour représenter un philosophe
+// Identifiant du philosophe
+// Thread du philosophe
+// Pointeur vers la fourchette de gauche
+// Pointeur vers la fourchette de droite
+// Délai avant la mort du philosophe
+// Délai pour manger
+// Délai pour dormir
+// Nombre de repas mange
+// Temps du dernier repas
+// Temps actuel
+// Temps au debut
+// Différence de temps
 typedef struct s_Philosopher
 {
-	int id; // Identifiant du philosophe
-	pthread_t thread; // Thread du philosophe
-	pthread_mutex_t *left_fork; // Pointeur vers la fourchette de gauche
-	pthread_mutex_t *right_fork; // Pointeur vers la fourchette de droite
-	int time_to_die; // Délai avant la mort du philosophe
-	int time_to_eat; // Délai pour manger
-	int time_to_sleep; // Délai pour dormir
-	int meals_eaten; // Nombre de repas mange
-	struct timeval last_meal_time; // Temps du dernier repas
-	struct timeval current_time; // Temps actuel
-	struct timeval	start_time; // Temps au debut
-	long long time_diff; // Différence de temps
+	int					id;
+	pthread_t			thread;
+	pthread_mutex_t		*left_fork;
+	pthread_mutex_t		*right_fork;
+	int					time_to_die;
+	int					time_to_eat;
+	int					time_to_sleep;
+	int					meals_eaten;
+	struct timeval		lmt;
+	struct timeval		curt;
+	struct timeval		start_time;
+	long long			time_diff;
 	struct s_Simulation	*sim;
 }	t_Philosopher;
 
 // Structure pour représenter la simulation
+// Tableau des fourchettes
+// Tableau des philosophes
+// Nombre total de philosophes
+// Délai avant la mort d'un philosophe
+// Délai pour manger
+// Délai pour dormir
+// Mutex pour l'affichage
+// Mutex pour mort
+// Indicateur si un philosophe est mort
+// Combien de fois doivent manger
 typedef struct s_Simulation
 {
-	pthread_mutex_t *forks; // Tableau des fourchettes
-	t_Philosopher *philosophers; // Tableau des philosophes
-	int num_philosophers; // Nombre total de philosophes
-	int time_to_die; // Délai avant la mort d'un philosophe
-	int time_to_eat; // Délai pour manger
-	int time_to_sleep; // Délai pour dormir
-	pthread_mutex_t print_mutex; // Mutex pour l'affichage
-	pthread_mutex_t someone_died_mutex;
-	int someone_died; // Indicateur si un philosophe est mort
-	int num_times_each_must_eat;
-	}	t_Simulation;
+	pthread_mutex_t	*forks;
+	t_Philosopher	*philosophers;
+	int				num_philosophers;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	someone_died_mutex;
+	int				someone_died;
+	int				mueat;
+}	t_Simulation;
 
 // Déclaration des fonctions
 int		init_simulation(t_Simulation *sim, char **argv);
@@ -69,6 +91,6 @@ void	print_message(t_Philosopher *philosopher, const char *message);
 int		error_forks(t_Simulation *sim);
 int		error_philo(t_Simulation *sim);
 int		ft_atoi(const char *str);
-
+void	print_message(t_Philosopher *philosopher, const char *message);
 
 #endif

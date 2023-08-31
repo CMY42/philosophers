@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/29 20:00:31 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/08/31 17:38:28 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	create_philosophers(t_Simulation *sim)
 		if (pthread_create(&(philo->thread), NULL, philosopher_thread, philo)
 			!= 0)
 			exit(EXIT_FAILURE);
-		gettimeofday(&(sim->philosophers[i].last_meal_time), NULL);
+		gettimeofday(&(sim->philosophers[i].lmt), NULL);
 		i++;
 	}
 }
@@ -110,12 +110,12 @@ int	init_simulation(t_Simulation *sim, char **argv)
 {
 	int	i;
 
-	sim->num_philosophers = atoi(argv[1]);
-	sim->time_to_die = atoi(argv[2]);
-	sim->time_to_eat = atoi(argv[3]);
-	sim->time_to_sleep = atoi(argv[4]);
+	sim->num_philosophers = ft_atoi(argv[1]);
+	sim->time_to_die = ft_atoi(argv[2]);
+	sim->time_to_eat = ft_atoi(argv[3]);
+	sim->time_to_sleep = ft_atoi(argv[4]);
 	if (argv[5])
-		sim->num_times_each_must_eat = atoi(argv[5]);
+		sim->mueat = ft_atoi(argv[5]);
 	sim->someone_died = 0;
 	sim->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t)
 			* sim->num_philosophers);

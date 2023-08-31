@@ -6,13 +6,13 @@
 #    By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/25 14:23:52 by cmansey           #+#    #+#              #
-#    Updated: 2023/08/28 17:58:28 by cmansey          ###   ########.fr        #
+#    Updated: 2023/08/31 17:44:12 by cmansey          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 
-SRC = philo.c simulation.c error.c
+SRC = philo.c simulation.c utils.c
 
 OBJ := $(SRC:%.c=%.o)
 
