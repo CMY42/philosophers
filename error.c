@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:39:32 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/29 20:37:11 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/20 16:41:41 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,9 @@
 
 int	error_forks(t_Simulation *sim)
 {
-
 	free(sim->forks);
 	exit(EXIT_FAILURE);
 	return (0);
-
 }
 
 int	error_philo(t_Simulation *sim)
@@ -27,6 +25,13 @@ int	error_philo(t_Simulation *sim)
 	free(sim->philosophers);
 	exit(EXIT_FAILURE);
 	return (0);
+}
+
+int	ft_error(char *str, int code)
+{
+	write(2, str, ft_strlen(str));
+	write(2, "\n", 1);
+	return (code);
 }
 
 int	ft_atoi(const char *str)

@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/20 16:02:43 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/20 18:02:41 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@ static void	ft_monitor(t_Simulation *sim)
 
 	while (!sim->someone_died)
 	{
-		usleep(3000);
 		i = 0;
 		philos_done_eating = 0;
 		while (i < sim->num_philosophers && !sim->someone_died)
@@ -40,6 +39,8 @@ static void	ft_monitor(t_Simulation *sim)
 		if (sim->mueat > 0 && philos_done_eating == sim->num_philosophers)
 			sim->someone_died = 1;
 	}
+	if (sim->someone_died == 1)
+		exit(0);
 }
 
 // Créer les threads pour chaque philosophe
@@ -62,46 +63,6 @@ void	create_philosophers(t_Simulation *sim)
 	}
 	ft_monitor(sim);
 }
-
-// Libérer les mutex des fourchettes
-// Libérer les ressources des philosophes
-// Détruire le mutex pour l'affichage
-void	cleanup_simulation(t_Simulation *sim)
-{
-	int	i;
-
-	i = 0;
-	while (i < sim->num_philosophers)
-	{
-		pthread_mutex_destroy(&(sim->forks[i]));
-		i++;
-	}
-	free(sim->forks);
-	free(sim->philosophers);
-	pthread_mutex_destroy(&(sim->someone_died_mutex));
-	pthread_mutex_destroy(&(sim->print_mutex));
-}
-/*void cleanup_simulation(t_Simulation *sim)
-{
-	int i;
-
-	// Attendre la fin de tous les threads avant de nettoyer les ressources
-	for (i = 0; i < sim->num_philosophers; i++)
-	{
-		pthread_join(sim->philosophers[i].thread, NULL);
-	}
-
-	// Détruire les mutex des fourchettes
-	for (i = 0; i < sim->num_philosophers; i++)
-	{
-		pthread_mutex_destroy(&(sim->forks[i]));
-	}
-
-	free(sim->forks);
-	free(sim->philosophers);
-	pthread_mutex_destroy(&(sim->someone_died_mutex));
-	pthread_mutex_destroy(&(sim->print_mutex));
-}*/
 
 void	start_simulation(t_Simulation *sim)
 {
@@ -161,7 +122,7 @@ int	init_simulation(t_Simulation *sim, char **argv)
 	i = -1;
 	while (++i < sim->num_philosophers)
 		pthread_mutex_init(&(sim->forks[i]), NULL);
-	pthread_mutex_init(&(sim->someone_died_mutex), NULL);
+	//pthread_mutex_init(&(sim->someone_died_mutex), NULL);
 	init_philo(sim);
 	pthread_mutex_init(&(sim->print_mutex), NULL);
 	return (1);
