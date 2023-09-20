@@ -6,24 +6,11 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:28 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/31 17:46:40 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/20 16:04:45 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-// Mort d'un philo
-void	philo_die(void *arg)
-{
-	t_Philosopher	*philosopher;
-
-	philosopher = (t_Philosopher *)arg;
-	pthread_mutex_lock(&(philosopher->sim->someone_died_mutex));
-	philosopher->sim->someone_died = 1;
-	pthread_mutex_unlock(&(philosopher->sim->someone_died_mutex));
-	print_message(philosopher, "died");
-	exit (0);
-}
 
 // Routine
 void	*philosopher_thread(void *arg)
@@ -31,26 +18,22 @@ void	*philosopher_thread(void *arg)
 	t_Philosopher	*ph;
 
 	ph = (t_Philosopher *)arg;
-	gettimeofday(&(ph->start_time), NULL);
 	while (!ph->sim->someone_died)
 	{
-		gettimeofday(&(ph->curt), NULL);
-		ph->time_diff = (((ph->curt.tv_sec - ph->lmt.tv_sec) * 1000)
-				+ ((ph->curt.tv_usec - ph->lmt.tv_usec) / 1000) * 0.9 + 1);
-		if (ph->time_diff >= ph->time_to_die || ph->sim->num_philosophers == 1)
-			philo_die(arg);
-		print_message(ph, "is thinking");
 		take_forks(ph);
 		print_message(ph, "has taken a fork");
+		pthread_mutex_lock(&(ph->control));
 		print_message(ph, "is eating");
-		gettimeofday(&(ph->lmt), NULL);
+		ph->die_time = get_time() + ph->time_to_die;
 		ph->meals_eaten++;
-		usleep(1000 * ph->time_to_eat);
+		if (!ph->sim->someone_died)
+			ft_usleep(ph->time_to_eat);
+		pthread_mutex_unlock(&(ph->control));
 		put_forks(ph);
-		if (ph->sim->mueat > 0 && ph->meals_eaten == ph->sim->mueat)
-			return (NULL);
 		print_message(ph, "is sleeping");
-		usleep(1000 * ph->time_to_sleep);
+		if (!ph->sim->someone_died)
+			ft_usleep(ph->time_to_sleep);
+		print_message(ph, "is thinking");
 	}
 	return (NULL);
 }
@@ -95,27 +78,92 @@ void	put_forks(t_Philosopher *philosopher)
 	}
 }
 
+//Voir si les arg sont OK
+static int	ft_arg(char *argv)
+{
+	int	i;
+
+	i = 0;
+	while (argv[i] == ' ')
+		i++;
+	if (argv[i] == '+')
+		i++;
+	while (argv[i] >= '0' && argv[i] <= '9')
+		i++;
+	while (argv[i] == ' ')
+		i++;
+	if (argv[i] != 0)
+		return (0);
+	return (1);
+}
+
+//Voir si les args sont OK
+int	ft_check_args(int argc, char **argv)
+{
+	int	i;
+
+	i = 1;
+	while (i < argc)
+	{
+		if (ft_arg(argv[i]) == 0 || ft_atoi(argv[i]) > 2147483647
+			|| ft_atoi(argv[i]) < 0)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+//Imprimer erreurs
+int	ft_error(char *str, int code)
+{
+	write(2, str, ft_strlen(str));
+	write(2, "\n", 1);
+	return (code);
+}
+
+void	*unique_routine(void *args)
+{
+	t_Philosopher	*philo;
+
+	philo = (t_Philosopher *)args;
+	pthread_mutex_lock(philo->left_fork);
+	print_message(philo, "has taken a fork");
+	ft_usleep(philo->time_to_die);
+	print_message(philo, "died");
+	pthread_mutex_unlock(philo->left_fork);
+	return (NULL);
+}
+
+static int	one_philo(t_Simulation *sim)
+{
+	sim->start = get_time();
+	sim->philosophers->die_time = sim->start + sim->philosophers->time_to_die;
+	if (pthread_create(&(sim->philosophers->thread),
+			NULL, &unique_routine, sim->philosophers))
+		return (1);
+	pthread_join(sim->philosophers->thread, NULL);
+	return (0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_Simulation	sim;
 
 	if (argc < 5 || argc > 6)
-	{
-		printf("Wrong numbers of arguments.\n");
-		return (EXIT_FAILURE);
-	}
+		return (ft_error("Wrong numbers of arguments.", 1));
+	if (ft_check_args(argc, argv))
+		return (ft_error("Wrong type of arguments.", 1));
 	if (!init_simulation(&sim, argv))
-	{
-		fprintf(stderr, "Error: Failed to initialize simulation.\n");
-		return (EXIT_FAILURE);
-	}
-	create_philosophers(&sim);
+		return (ft_error("Error: Failed to initialize simulation.", 1));
 	if (sim.num_philosophers < 1)
+		return (ft_error("Number of philosophers must be greater than 0.", 1));
+	if (ft_atoi(argv[1]) == 1)
+		one_philo(&sim);
+	else
 	{
-		fprintf(stderr, "Number of philosophers must be greater than 0.\n");
-		return (1);
+		create_philosophers(&sim);
+		start_simulation(&sim);
 	}
-	start_simulation(&sim);
 	cleanup_simulation(&sim);
 	return (0);
 }

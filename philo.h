@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/31 17:43:51 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/20 15:51:23 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ typedef struct s_Philosopher
 	struct timeval		lmt;
 	struct timeval		curt;
 	struct timeval		start_time;
-	long long			time_diff;
+	long long			die_time;
+	pthread_mutex_t		control;
 	struct s_Simulation	*sim;
 }	t_Philosopher;
 
@@ -77,6 +78,7 @@ typedef struct s_Simulation
 	pthread_mutex_t	someone_died_mutex;
 	int				someone_died;
 	int				mueat;
+	long long		start;
 }	t_Simulation;
 
 // Déclaration des fonctions
@@ -92,5 +94,9 @@ int		error_forks(t_Simulation *sim);
 int		error_philo(t_Simulation *sim);
 int		ft_atoi(const char *str);
 void	print_message(t_Philosopher *philosopher, const char *message);
+void	ft_usleep(long long time_ms);
+long long	get_time(void);
+int	ft_error(char *str, int code);
+size_t	ft_strlen(char const *str);
 
 #endif

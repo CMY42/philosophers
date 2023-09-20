@@ -6,11 +6,41 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/08/31 17:38:28 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/20 16:02:43 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+//Monitorer les philos
+//Voir sir mort ou a fini de manger ses repas
+static void	ft_monitor(t_Simulation *sim)
+{
+	int	i;
+	int	philos_done_eating;
+
+	while (!sim->someone_died)
+	{
+		usleep(3000);
+		i = 0;
+		philos_done_eating = 0;
+		while (i < sim->num_philosophers && !sim->someone_died)
+		{
+			pthread_mutex_lock(&sim->philosophers[i].control);
+			if (get_time() > sim->philosophers[i].die_time)
+			{
+				print_message(sim->philosophers, "die");
+				sim->someone_died = 1;
+			}
+			if (sim->philosophers[i].meals_eaten >= sim->mueat)
+				philos_done_eating++;
+			pthread_mutex_unlock(&sim->philosophers[i].control);
+			i++;
+		}
+		if (sim->mueat > 0 && philos_done_eating == sim->num_philosophers)
+			sim->someone_died = 1;
+	}
+}
 
 // Créer les threads pour chaque philosophe
 void	create_philosophers(t_Simulation *sim)
@@ -19,15 +49,18 @@ void	create_philosophers(t_Simulation *sim)
 	int				i;
 
 	i = 0;
+	sim->start = get_time();
 	while (i < sim->num_philosophers)
 	{
 		philo = &(sim->philosophers[i]);
+		sim->philosophers[i].die_time = sim->start
+			+ sim->philosophers->time_to_die;
 		if (pthread_create(&(philo->thread), NULL, philosopher_thread, philo)
 			!= 0)
-			exit(EXIT_FAILURE);
-		gettimeofday(&(sim->philosophers[i].lmt), NULL);
+			exit(1);
 		i++;
 	}
+	ft_monitor(sim);
 }
 
 // Libérer les mutex des fourchettes
