@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:28 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/20 18:02:48 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/21 20:13:34 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,16 @@ void	*philosopher_thread(void *arg)
 	{
 		take_forks(ph);
 		print_message(ph, "has taken a fork");
-		pthread_mutex_lock(&(ph->control));
-		print_message(ph, "is eating");
+		print_message(ph, "has taken a fork");
+		pthread_mutex_lock(&ph->control);
 		ph->die_time = get_time() + ph->time_to_die;
-		ph->meals_eaten++;
+		pthread_mutex_unlock(&ph->control);
+		print_message(ph, "is eating");
 		if (!ph->sim->someone_died)
 			ft_usleep(ph->time_to_eat);
-		pthread_mutex_unlock(&(ph->control));
+		pthread_mutex_lock(&ph->control);
+		ph->meals_eaten++;
+		pthread_mutex_unlock(&ph->control);
 		put_forks(ph);
 		print_message(ph, "is sleeping");
 		if (!ph->sim->someone_died)

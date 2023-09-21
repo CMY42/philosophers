@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/20 17:33:10 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/21 20:00:09 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 # include <fcntl.h>
 # include <sys/time.h>
 # include <pthread.h>
+# include <stdatomic.h>
+
 
 // Structure pour représenter un philosophe
 // Identifiant du philosophe
@@ -58,7 +60,6 @@ typedef struct s_Philosopher
 // Délai pour manger
 // Délai pour dormir
 // Mutex pour l'affichage
-// Mutex pour mort
 // Indicateur si un philosophe est mort
 // Combien de fois doivent manger
 // Temps depart sim;
@@ -71,8 +72,7 @@ typedef struct s_Simulation
 	int				time_to_eat;
 	int				time_to_sleep;
 	pthread_mutex_t	print_mutex;
-	//pthread_mutex_t	someone_died_mutex;
-	int				someone_died;
+	atomic_int		someone_died;
 	int				mueat;
 	long long		start;
 }	t_Simulation;

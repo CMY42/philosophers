@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:39:32 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/20 17:33:17 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/21 19:48:45 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,6 @@ void	cleanup_simulation(t_Simulation *sim)
 	}
 	free(sim->forks);
 	free(sim->philosophers);
-	//pthread_mutex_destroy(&(sim->someone_died_mutex));
 	pthread_mutex_destroy(&(sim->print_mutex));
 }
 
@@ -69,6 +68,8 @@ void	print_message(t_Philosopher *philosopher, const char *message)
 
 	timestamp_ms = get_time() - philosopher->sim->start;
 	pthread_mutex_lock(&(philosopher->sim->print_mutex));
-	printf("%lld %d %s\n", timestamp_ms, philosopher->id + 1, message);
+	if (!philosopher->sim->someone_died)
+		printf("%lld \033[1;32m%d %s\n\033[0m",
+			timestamp_ms, philosopher->id + 1, message);
 	pthread_mutex_unlock(&(philosopher->sim->print_mutex));
 }

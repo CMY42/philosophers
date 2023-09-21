@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 18:09:23 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/20 18:02:41 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/21 20:13:57 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static void	ft_monitor(t_Simulation *sim)
 		philos_done_eating = 0;
 		while (i < sim->num_philosophers && !sim->someone_died)
 		{
-			pthread_mutex_lock(&sim->philosophers[i].control);
+			pthread_mutex_lock(&(sim->philosophers[i].control));
 			if (get_time() > sim->philosophers[i].die_time)
 			{
 				print_message(sim->philosophers, "die");
@@ -33,14 +33,12 @@ static void	ft_monitor(t_Simulation *sim)
 			}
 			if (sim->philosophers[i].meals_eaten >= sim->mueat)
 				philos_done_eating++;
-			pthread_mutex_unlock(&sim->philosophers[i].control);
+			pthread_mutex_unlock(&(sim->philosophers[i].control));
 			i++;
 		}
 		if (sim->mueat > 0 && philos_done_eating == sim->num_philosophers)
 			sim->someone_died = 1;
 	}
-	if (sim->someone_died == 1)
-		exit(0);
 }
 
 // Créer les threads pour chaque philosophe
@@ -58,7 +56,7 @@ void	create_philosophers(t_Simulation *sim)
 			+ sim->philosophers->time_to_die;
 		if (pthread_create(&(philo->thread), NULL, philosopher_thread, philo)
 			!= 0)
-			exit(1);
+			break ;
 		i++;
 	}
 	ft_monitor(sim);
@@ -122,7 +120,6 @@ int	init_simulation(t_Simulation *sim, char **argv)
 	i = -1;
 	while (++i < sim->num_philosophers)
 		pthread_mutex_init(&(sim->forks[i]), NULL);
-	//pthread_mutex_init(&(sim->someone_died_mutex), NULL);
 	init_philo(sim);
 	pthread_mutex_init(&(sim->print_mutex), NULL);
 	return (1);
