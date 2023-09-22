@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/25 14:22:21 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/21 20:00:09 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/22 15:47:44 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@
 # include <sys/time.h>
 # include <pthread.h>
 # include <stdatomic.h>
-
 
 // Structure pour représenter un philosophe
 // Identifiant du philosophe
@@ -46,8 +45,8 @@ typedef struct s_Philosopher
 	int					time_to_die;
 	int					time_to_eat;
 	int					time_to_sleep;
-	int					meals_eaten;
-	long long			die_time;
+	atomic_int			meals_eaten;
+	atomic_llong		die_time;
 	pthread_mutex_t		control;
 	struct s_Simulation	*sim;
 }	t_Philosopher;

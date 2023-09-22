@@ -6,7 +6,7 @@
 #    By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/04/25 14:23:52 by cmansey           #+#    #+#              #
-#    Updated: 2023/09/21 14:40:46 by cmansey          ###   ########.fr        #
+#    Updated: 2023/09/22 15:44:12 by cmansey          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,7 @@ OBJ := $(SRC:%.c=%.o)
 
 CC = gcc
 RM = rm -f
-CFLAGS = -Wextra -Wall -Werror -pthread -lpthread
+CFLAGS = -Wextra -Wall -Werror -pthread
 
 all: $(NAME)
 

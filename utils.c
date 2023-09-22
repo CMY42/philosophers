@@ -6,7 +6,7 @@
 /*   By: cmansey <marvin@42lausanne.ch>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 12:39:32 by cmansey           #+#    #+#             */
-/*   Updated: 2023/09/21 19:48:45 by cmansey          ###   ########.fr       */
+/*   Updated: 2023/09/22 15:44:54 by cmansey          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ void	print_message(t_Philosopher *philosopher, const char *message)
 
 	timestamp_ms = get_time() - philosopher->sim->start;
 	pthread_mutex_lock(&(philosopher->sim->print_mutex));
-	if (!philosopher->sim->someone_died)
+	if (!philosopher->sim->someone_died && (philosopher->sim->mueat == 0
+			|| philosopher->meals_eaten < philosopher->sim->mueat))
 		printf("%lld \033[1;32m%d %s\n\033[0m",
 			timestamp_ms, philosopher->id + 1, message);
 	pthread_mutex_unlock(&(philosopher->sim->print_mutex));
